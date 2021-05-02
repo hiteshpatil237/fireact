@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { signup } from '../firebase/auth'
 
-function Signup() {
+function Signup(props) {
   const { reset, register, handleSubmit } = useForm()
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const onSubmit = async(data) => {
+  const onSubmit = async (data) => {
+    let newUser
     setIsLoading(true)
     try {
-      await signup(data)
+      newUser = await signup(data)
       reset()
     } catch (err) {
       console.log(err)
     }
-    setIsLoading(false)
+    if (newUser) {
+      props.history.push(`/profile/${newUser.uid}`)
+    } else {
+      setIsLoading(false)
+    }
   }
 
   const formClassName = `ui form ${isLoading ? 'loading' : ''}`
@@ -56,9 +62,13 @@ function Signup() {
                 <input type="password" name="password" placeholder="Password" ref={register} />
               </label>
             </div>
-            <button className="ui primary button login" type="submit">
-              Sign Up
-            </button>
+            <div className="field actions">
+              <button className="ui primary button signup" type="submit">
+                Sign Up
+              </button>
+              or
+              <Link to='/login'>Login</Link>
+            </div>
           </form>
         </div>
       </div>
